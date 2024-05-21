@@ -285,7 +285,6 @@ class OpenAIClient:
             # If streaming is not enabled, send a regular chat completion request
             params = params.copy()
             params["stream"] = False
-            del params['source']
             response = completions.create(**params)
 
         return response

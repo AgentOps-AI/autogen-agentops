@@ -1463,7 +1463,8 @@ class ConversableAgent(LLMAgent):
             else:
                 iostream.print(
                     colored(
-                        f"\n>>>>>>>> EXECUTING {num_code_blocks} CODE BLOCKS (inferred languages are [{', '.join([x.language for x in code_blocks])}])...",
+                        f"\n>>>>>>>> EXECUTING {num_code_blocks} CODE BLOCKS (inferred languages are [{
+                            ', '.join([x.language for x in code_blocks])}])...",
                         "red",
                     ),
                     flush=True,
@@ -1725,7 +1726,8 @@ class ConversableAgent(LLMAgent):
         sender_name = "the sender" if sender is None else sender.name
         if self.human_input_mode == "ALWAYS":
             reply = self.get_human_input(
-                f"Provide feedback to {sender_name}. Press enter to skip and use auto-reply, or type 'exit' to end the conversation: "
+                f"Provide feedback to {
+                    sender_name}. Press enter to skip and use auto-reply, or type 'exit' to end the conversation: "
             )
             no_human_input_msg = "NO HUMAN INPUT RECEIVED." if not reply else ""
             # if the human input is empty, and the message is a termination message, then we will terminate the conversation
@@ -1838,7 +1840,8 @@ class ConversableAgent(LLMAgent):
         sender_name = "the sender" if sender is None else sender.name
         if self.human_input_mode == "ALWAYS":
             reply = await self.a_get_human_input(
-                f"Provide feedback to {sender_name}. Press enter to skip and use auto-reply, or type 'exit' to end the conversation: "
+                f"Provide feedback to {
+                    sender_name}. Press enter to skip and use auto-reply, or type 'exit' to end the conversation: "
             )
             no_human_input_msg = "NO HUMAN INPUT RECEIVED." if not reply else ""
             # if the human input is empty, and the message is a termination message, then we will terminate the conversation
@@ -2153,7 +2156,7 @@ class ConversableAgent(LLMAgent):
                 exitcode, logs, image = self.run_code(code, lang=lang, **self._code_execution_config)
             elif lang in PYTHON_VARIANTS:
                 if code.startswith("# filename: "):
-                    filename = code[11 : code.find("\n")].strip()
+                    filename = code[11: code.find("\n")].strip()
                 else:
                     filename = None
                 exitcode, logs, image = self.run_code(
@@ -2246,8 +2249,9 @@ class ConversableAgent(LLMAgent):
                 )
                 try:
                     content = func(**arguments)
-                    # TODO: We should also log when the function failed to call, which autogen may be more interested in
-                    log_function_use(self, func, arguments, content)
+                    if logging_enabled():
+                        # TODO: We should also log when the function failed to call, which autogen may be more interested in
+                        log_function_use(self, func, arguments, content)
                     is_exec_success = True
                 except Exception as e:
                     content = f"Error: {e}"
@@ -2310,8 +2314,9 @@ class ConversableAgent(LLMAgent):
                         # Fallback to sync function if the function is not async
                         content = func(**arguments)
 
-                    # TODO: We should also log when the function failed to call, which autogen may be more interested in
-                    log_function_use(self, func, arguments, content)
+                    if logging_enabled():
+                        # TODO: We should also log when the function failed to call, which autogen may be more interested in
+                        log_function_use(self, func, arguments, content)
                     is_exec_success = True
                 except Exception as e:
                     content = f"Error: {e}"
@@ -2443,7 +2448,8 @@ class ConversableAgent(LLMAgent):
         else:
             if not isinstance(func_sig, dict):
                 raise ValueError(
-                    f"The function signature must be of the type dict. Received function signature type {type(func_sig)}"
+                    f"The function signature must be of the type dict. Received function signature type {
+                        type(func_sig)}"
                 )
 
             self._assert_valid_name(func_sig["name"])
