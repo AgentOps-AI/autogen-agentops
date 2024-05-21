@@ -56,6 +56,7 @@ class FileLogger(BaseLogger):
         invocation_id: uuid.UUID,
         client_id: int,
         wrapper_id: int,
+        agent: Union[str, Agent],
         request: Dict[str, Union[float, str, List[Dict[str, str]]]],
         response: Union[str, ChatCompletion],
         is_cached: int,
@@ -72,6 +73,7 @@ class FileLogger(BaseLogger):
                     "invocation_id": str(invocation_id),
                     "client_id": client_id,
                     "wrapper_id": wrapper_id,
+                    # "agent": str(agent) if isinstance(agent, Agent) else agent,  # TODO
                     "request": to_dict(request),
                     "response": str(response),
                     "is_cached": is_cached,

@@ -33,7 +33,7 @@ class BaseLogger(ABC):
         invocation_id: uuid.UUID,
         client_id: int,
         wrapper_id: int,
-        source: Union[str, Agent],
+        agent: Union[str, Agent],
         request: Dict[str, Union[float, str, List[Dict[str, str]]]],
         response: Union[str, ChatCompletion],
         is_cached: int,
@@ -51,7 +51,7 @@ class BaseLogger(ABC):
             invocation_id (uuid):               A unique identifier for the invocation to the OpenAIWrapper.create method call
             client_id (int):                    A unique identifier for the underlying OpenAI client instance
             wrapper_id (int):                   A unique identifier for the OpenAIWrapper instance
-            source (str or Agent):              The source/creator of the event as a string name or an Agent instance
+            agent (str or Agent):               The creator of the event as a string name or an Agent instance
             request (dict):                     A dictionary representing the request or call to the OpenAI client endpoint
             response (str or ChatCompletion):   The response from OpenAI
             is_cached (int):                    1 if the response was a cache hit, 0 otherwise

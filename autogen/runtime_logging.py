@@ -57,7 +57,7 @@ def log_chat_completion(
     invocation_id: uuid.UUID,
     client_id: int,
     wrapper_id: int,
-    source: Union[str, Agent],
+    agent: Union[str, Agent],
     request: Dict[str, Union[float, str, List[Dict[str, str]]]],
     response: Union[str, ChatCompletion],
     is_cached: int,
@@ -69,7 +69,7 @@ def log_chat_completion(
         return
 
     autogen_logger.log_chat_completion(
-        invocation_id, client_id, wrapper_id, source, request, response, is_cached, cost, start_time
+        invocation_id, client_id, wrapper_id, agent, request, response, is_cached, cost, start_time
     )
 
 

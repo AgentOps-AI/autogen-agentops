@@ -48,7 +48,7 @@ class AgentOpsLogger(BaseLogger):
         invocation_id: uuid.UUID,
         client_id: int,
         wrapper_id: int,
-        source: Union[str, Agent],
+        agent: Union[str, Agent],
         request: Dict[str, Union[float, str, List[Dict[str, str]]]],
         response: Union[str, ChatCompletion],
         is_cached: int,
@@ -62,7 +62,7 @@ class AgentOpsLogger(BaseLogger):
         llm_event = LLMEvent(prompt=request['messages'], completion=completion.message, model=response.model)
         llm_event.init_timestamp = start_time
         llm_event.end_timestamp = end_time
-        llm_event.agent_id = self._get_agentops_id_from_agent(str(id(source)))
+        llm_event.agent_id = self._get_agentops_id_from_agent(str(id(agent)))
         agentops.record(llm_event)
 
     def log_new_agent(self, agent: ConversableAgent, init_args: Dict[str, Any]) -> None:

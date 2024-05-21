@@ -142,14 +142,16 @@ class OpenAIClient:
             return [  # type: ignore [return-value]
                 (
                     choice.message  # type: ignore [union-attr]
-                    if choice.message.function_call is not None or choice.message.tool_calls is not None  # type: ignore [union-attr]
+                    # type: ignore [union-attr]
+                    if choice.message.function_call is not None or choice.message.tool_calls is not None
                     else choice.message.content
                 )  # type: ignore [union-attr]
                 for choice in choices
             ]
         else:
             return [  # type: ignore [return-value]
-                choice.message if choice.message.function_call is not None else choice.message.content  # type: ignore [union-attr]
+                # type: ignore [union-attr]
+                choice.message if choice.message.function_call is not None else choice.message.content
                 for choice in choices
             ]
 
@@ -165,7 +167,8 @@ class OpenAIClient:
         """
         iostream = IOStream.get_default()
 
-        completions: Completions = self._oai_client.chat.completions if "messages" in params else self._oai_client.completions  # type: ignore [attr-defined]
+        # type: ignore [attr-defined]
+        completions: Completions = self._oai_client.chat.completions if "messages" in params else self._oai_client.completions
         # If streaming is enabled and has messages, then iterate over the chunks of the response.
         if params.get("stream", False) and "messages" in params:
             response_contents = [""] * params.get("n", 1)
@@ -296,13 +299,15 @@ class OpenAIClient:
             return 0
 
         n_input_tokens = response.usage.prompt_tokens if response.usage is not None else 0  # type: ignore [union-attr]
-        n_output_tokens = response.usage.completion_tokens if response.usage is not None else 0  # type: ignore [union-attr]
+        # type: ignore [union-attr]
+        n_output_tokens = response.usage.completion_tokens if response.usage is not None else 0
         if n_output_tokens is None:
             n_output_tokens = 0
         tmp_price1K = OAI_PRICE1K[model]
         # First value is input token rate, second value is output token rate
         if isinstance(tmp_price1K, tuple):
-            return (tmp_price1K[0] * n_input_tokens + tmp_price1K[1] * n_output_tokens) / 1000  # type: ignore [no-any-return]
+            # type: ignore [no-any-return]
+            return (tmp_price1K[0] * n_input_tokens + tmp_price1K[1] * n_output_tokens) / 1000
         return tmp_price1K * (n_input_tokens + n_output_tokens) / 1000  # type: ignore [operator]
 
     @staticmethod
@@ -425,7 +430,8 @@ class OpenAIWrapper:
             # adding placeholder until the register_model_client is called with the appropriate class
             self._clients.append(PlaceHolderClient(config))
             logger.info(
-                f"Detected custom model client in config: {model_client_cls_name}, model client can not be used until register_model_client is called."
+                f"Detected custom model client in config: {
+                    model_client_cls_name}, model client can not be used until register_model_client is called."
             )
             # TODO: logging for custom client
         else:
@@ -464,12 +470,14 @@ class OpenAIWrapper:
 
         if existing_client_class:
             logger.warn(
-                f"Model client {model_client_cls.__name__} is already registered. Add more entries in the config_list to use multiple model clients."
+                f"Model client {
+                    model_client_cls.__name__} is already registered. Add more entries in the config_list to use multiple model clients."
             )
         else:
             raise ValueError(
                 f'Model client "{model_client_cls.__name__}" is being registered but was not found in the config_list. '
-                f'Please make sure to include an entry in the config_list with "model_client_cls": "{model_client_cls.__name__}"'
+                f'Please make sure to include an entry in the config_list with "model_client_cls": "{
+                    model_client_cls.__name__}"'
             )
 
     @classmethod
@@ -565,7 +573,8 @@ class OpenAIWrapper:
         ]
         if non_activated:
             raise RuntimeError(
-                f"Model client(s) {non_activated} are not activated. Please register the custom model clients using `register_model_client` or filter them out form the config list."
+                f"Model client(s) {
+                    non_activated} are not activated. Please register the custom model clients using `register_model_client` or filter them out form the config list."
             )
         for i, client in enumerate(self._clients):
             # merge the input config with the i-th config in the config list
@@ -619,7 +628,7 @@ class OpenAIWrapper:
                                 invocation_id=invocation_id,
                                 client_id=id(client),
                                 wrapper_id=id(self),
-                                source=full_config.get("source"),
+                                agent=full_config.get("source"),  # TODO: what is source?
                                 request=params,
                                 response=response,
                                 is_cached=1,
@@ -652,7 +661,7 @@ class OpenAIWrapper:
                         invocation_id=invocation_id,
                         client_id=id(client),
                         wrapper_id=id(self),
-                        source=full_config.get("source"),
+                        agent=full_config.get("source"),
                         request=params,
                         response=f"error_code:{error_code}, config {i} failed",
                         is_cached=0,
@@ -683,7 +692,7 @@ class OpenAIWrapper:
                         invocation_id=invocation_id,
                         client_id=id(client),
                         wrapper_id=id(self),
-                        source=full_config.get("source"),
+                        agent=full_config.get("source"),
                         request=params,
                         response=response,
                         is_cached=0,
@@ -861,7 +870,8 @@ class OpenAIWrapper:
                 if model == "total_cost":
                     continue  #
                 iostream.print(
-                    f"* Model '{model}': cost: {round(counts['cost'], 5)}, prompt_tokens: {counts['prompt_tokens']}, completion_tokens: {counts['completion_tokens']}, total_tokens: {counts['total_tokens']}",
+                    f"* Model '{model}': cost: {round(counts['cost'], 5)}, prompt_tokens: {counts['prompt_tokens']}, completion_tokens: {
+                        counts['completion_tokens']}, total_tokens: {counts['total_tokens']}",
                     flush=True,
                 )
 

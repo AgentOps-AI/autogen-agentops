@@ -191,7 +191,7 @@ class SqliteLogger(BaseLogger):
         invocation_id: uuid.UUID,
         client_id: int,
         wrapper_id: int,
-        source: Union[str, Agent],
+        agent: Union[str, Agent],
         request: Dict[str, Union[float, str, List[Dict[str, str]]]],
         response: Union[str, ChatCompletion],
         is_cached: int,
@@ -213,11 +213,19 @@ class SqliteLogger(BaseLogger):
                 invocation_id, client_id, wrapper_id, session_id, request, response, is_cached, cost, start_time, end_time
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
+
+        # TODO: Add agent
+        # query = """
+        #     INSERT INTO chat_completions (
+        #         invocation_id, client_id, wrapper_id, session_id, agent, request, response, is_cached, cost, start_time, end_time
+        #     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        # """
         args = (
             invocation_id,
             client_id,
             wrapper_id,
             self.session_id,
+            # agent,  # TODO
             json.dumps(request),
             response_messages,
             is_cached,
