@@ -31,11 +31,10 @@ from ..formatting_utils import colored
 from ..function_utils import get_function_schema, load_basemodels_if_needed, serialize_to_str
 from ..io.base import IOStream
 from ..oai.client import ModelClient, OpenAIWrapper
-from ..runtime_logging import log_event, log_new_agent, logging_enabled
+from ..runtime_logging import log_event, log_new_agent, logging_enabled, log_function_use
 from .agent import Agent, LLMAgent
 from .chat import ChatResult, a_initiate_chats, initiate_chats
 from .utils import consolidate_chat_info, gather_usage_summary
-from autogen.runtime_logging import log_function_use
 
 __all__ = ("ConversableAgent",)
 
@@ -758,7 +757,8 @@ class ConversableAgent(LLMAgent):
                 for tool_call in message["tool_calls"]:
                     id = tool_call.get("id", "No tool call id found")
                     function_call = dict(tool_call.get("function", {}))
-                    func_print = f"***** Suggested tool call ({id}): {function_call.get('name', '(No function name found)')} *****"
+                    func_print = f"***** Suggested tool call ({id}): {function_call.get('name',
+                                                                                        '(No function name found)')} *****"
                     iostream.print(colored(func_print, "green"), flush=True)
                     iostream.print(
                         "Arguments: \n",
@@ -1360,8 +1360,7 @@ class ConversableAgent(LLMAgent):
         response = llm_client.create(
             context=messages[-1].pop("context", None),
             messages=all_messages,
-            cache=cache,
-            source=self
+            cache=cache
         )
         extracted_response = llm_client.extract_text_or_completion_object(response)[0]
 
@@ -2247,6 +2246,8 @@ class ConversableAgent(LLMAgent):
                 )
                 try:
                     content = func(**arguments)
+                    # TODO: We should also log when the function failed to call, which autogen may be more interested in
+                    log_function_use(self, func, arguments, content)
                     is_exec_success = True
                 except Exception as e:
                     content = f"Error: {e}"
@@ -2308,6 +2309,9 @@ class ConversableAgent(LLMAgent):
                     else:
                         # Fallback to sync function if the function is not async
                         content = func(**arguments)
+
+                    # TODO: We should also log when the function failed to call, which autogen may be more interested in
+                    log_function_use(self, func, arguments, content)
                     is_exec_success = True
                 except Exception as e:
                     content = f"Error: {e}"
@@ -2411,7 +2415,7 @@ class ConversableAgent(LLMAgent):
         self._function_map.update(function_map)
         self._function_map = {k: v for k, v in self._function_map.items() if v is not None}
 
-    def update_function_signature(self, func_sig: Union[str, Dict], is_remove: bool = False):
+    def update_function_signature(self, func_sig: Union[str, Dict], is_remove: None):
         """update a function_signature in the LLM configuration for function_call.
 
         Args:
@@ -2455,7 +2459,7 @@ class ConversableAgent(LLMAgent):
 
         self.client = OpenAIWrapper(**self.llm_config)
 
-    def update_tool_signature(self, tool_sig: Union[str, Dict], is_remove: bool = False):
+    def update_tool_signature(self, tool_sig: Union[str, Dict], is_remove: None):
         """update a tool_signature in the LLM configuration for tool_call.
 
         Args:
@@ -2523,14 +2527,12 @@ class ConversableAgent(LLMAgent):
         @functools.wraps(func)
         def _wrapped_func(*args, **kwargs):
             retval = func(*args, **kwargs)
-            log_function_use(self, func, kwargs, retval)
             return serialize_to_str(retval)
 
         @load_basemodels_if_needed
         @functools.wraps(func)
         async def _a_wrapped_func(*args, **kwargs):
             retval = await func(*args, **kwargs)
-            log_function_use(self, func, kwargs, retval)
             return serialize_to_str(retval)
 
         wrapped_func = _a_wrapped_func if inspect.iscoroutinefunction(func) else _wrapped_func
