@@ -661,7 +661,7 @@ class OpenAIWrapper:
                         invocation_id=invocation_id,
                         client_id=id(client),
                         wrapper_id=id(self),
-                        agent=full_config.get("source"),
+                        agent=full_config.get("source"),  # TODO: what is source?
                         request=params,
                         response=f"error_code:{error_code}, config {i} failed",
                         is_cached=0,
@@ -692,7 +692,7 @@ class OpenAIWrapper:
                         invocation_id=invocation_id,
                         client_id=id(client),
                         wrapper_id=id(self),
-                        agent=full_config.get("source"),
+                        agent=full_config.get("source"),  # TODO: what is source?
                         request=params,
                         response=response,
                         is_cached=0,
