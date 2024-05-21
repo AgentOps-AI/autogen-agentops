@@ -51,7 +51,7 @@ class BaseLogger(ABC):
             invocation_id (uuid):               A unique identifier for the invocation to the OpenAIWrapper.create method call
             client_id (int):                    A unique identifier for the underlying OpenAI client instance
             wrapper_id (int):                   A unique identifier for the OpenAIWrapper instance
-            agent (str or Agent):               The creator of the event as a string name or an Agent instance
+            agent (str or Agent):               The agent that initiated the event as a string name or an Agent instance
             request (dict):                     A dictionary representing the request or call to the OpenAI client endpoint
             response (str or ChatCompletion):   The response from OpenAI
             is_cached (int):                    1 if the response was a cache hit, 0 otherwise
